@@ -1,4 +1,5 @@
 using API.Data;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +21,6 @@ namespace API.Controllers
             return await dataContext.Users.ToListAsync();
         }
 
-        // api/users/3
         [HttpGet("{id}")]
         public async Task<ActionResult<Entities.AppUser>> GetUser(int id)
         {
