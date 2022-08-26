@@ -24,7 +24,7 @@ namespace API.Controllers
         public async Task<ActionResult<UserDTO>> Register(DTOs.RegisterDTO registerDTO)
         {
 
-            if (await UserExists(registerDTO.Username)) return BadRequest("This username is taken. Please try again.");
+            if (await UserExists(registerDTO.Username)) return BadRequest("This username is already taken. Please try again.");
 
             using var hmac = new HMACSHA512();
 
