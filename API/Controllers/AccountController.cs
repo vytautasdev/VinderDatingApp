@@ -4,27 +4,28 @@ using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-
     public class AccountController : BaseApiController
     {
-        private readonly DataContext dataContext;
-        private readonly ITokenService tokenService;
+        private readonly DataContext _dataContext;
+        private readonly ITokenService _tokenService;
+        
         public AccountController(DataContext dataContext, ITokenService tokenService)
         {
-            this.tokenService = tokenService;
-            this.dataContext = dataContext;
+            _dataContext = dataContext;
+            _tokenService = tokenService;
         }
 
         [HttpPost("register")]
         public async Task<ActionResult<UserDTO>> Register(DTOs.RegisterDTO registerDTO)
         {
-
-            if (await UserExists(registerDTO.Username)) return BadRequest("This username is already taken. Please try again.");
+            if (await UserExists(registerDTO.Username))
+                return BadRequest("This username is already taken. Please try again.");
 
             using var hmac = new HMACSHA512();
 
@@ -35,20 +36,20 @@ namespace API.Controllers
                 PasswordSalt = hmac.Key
             };
 
-            dataContext.Users.Add(user);
-            await dataContext.SaveChangesAsync();
+            _dataContext.Users.Add(user);
+            await _dataContext.SaveChangesAsync();
 
             return new UserDTO
             {
                 Username = user.UserName,
-                Token = tokenService.CreateToken(user)
+                Token = _tokenService.CreateToken(user)
             };
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<UserDTO>> Login(DTOs.LoginDTO loginDTO)
         {
-            var user = await dataContext.Users.SingleOrDefaultAsync(item => item.UserName == loginDTO.Username);
+            var user = await _dataContext.Users.SingleOrDefaultAsync(item => item.UserName == loginDTO.Username);
 
             if (user == null) return Unauthorized("Invalid username.");
 
@@ -65,14 +66,14 @@ namespace API.Controllers
             return new UserDTO
             {
                 Username = user.UserName,
-                Token = tokenService.CreateToken(user)
+                Token = _tokenService.CreateToken(user)
             };
         }
 
         // helper method to check if given username already exists in the db
         private async Task<bool> UserExists(string username)
         {
-            return await dataContext.Users.AnyAsync(item => item.UserName == username.ToLower());
+            return await _dataContext.Users.AnyAsync(item => item.UserName == username.ToLower());
         }
     }
 }

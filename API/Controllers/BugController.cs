@@ -7,10 +7,11 @@ namespace API.Controllers
 {
     public class BugController : BaseApiController
     {
-        private readonly DataContext dataContext;
+        private readonly DataContext _dataContext;
+        
         public BugController(DataContext dataContext)
         {
-            this.dataContext = dataContext;
+            _dataContext = dataContext;
         }
 
         [Authorize]
@@ -23,7 +24,7 @@ namespace API.Controllers
         [HttpGet("not-found")]
         public ActionResult<AppUser> GetNotFound()
         {
-            var item = dataContext.Users.Find(-1);
+            var item = _dataContext.Users.Find(-1);
 
             if (item == null) return NotFound();
 
@@ -33,11 +34,11 @@ namespace API.Controllers
         [HttpGet("server-error")]
         public ActionResult<string> GetServerError()
         {
-            var item = dataContext.Users.Find(-1);
+            var thing = _dataContext.Users.Find(-1);
 
-            var itemToReturn = item.ToString();
+            var thingToReturn = thing.ToString();
 
-            return itemToReturn;
+            return thingToReturn;
         }
 
         [HttpGet("bad-request")]
