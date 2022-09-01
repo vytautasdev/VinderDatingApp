@@ -1,6 +1,6 @@
 namespace API.DTOs
 {
-    public class MemberDTO
+    public class MemberDto
     {
         public int Id { get; set; }
 
@@ -28,6 +28,6 @@ namespace API.DTOs
 
         public string Country { get; set; }
 
-        public ICollection<PhotoDTO> Photos { get; set; }
+        public ICollection<PhotoDto> Photos { get; set; }
     }
 }

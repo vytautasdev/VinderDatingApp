@@ -31,18 +31,18 @@ namespace API.Data
                 .SingleOrDefaultAsync(x => x.UserName == username);
         }
 
-        public async Task<MemberDTO> GetMemberAsync(string username)
+        public async Task<MemberDto> GetMemberAsync(string username)
         {
             return await _dataContext.Users
                 .Where(x => x.UserName == username)
-                .ProjectTo<MemberDTO>(_mapper.ConfigurationProvider)
+                .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<MemberDTO>> GetMembersAsync()
+        public async Task<IEnumerable<MemberDto>> GetMembersAsync()
         {
             return await _dataContext.Users
-                .ProjectTo<MemberDTO>(_mapper.ConfigurationProvider)
+                .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
         }
 
