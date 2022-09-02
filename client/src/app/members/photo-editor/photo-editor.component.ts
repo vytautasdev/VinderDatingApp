@@ -71,10 +71,15 @@ export class PhotoEditorComponent implements OnInit {
       file.withCredentials = false;
     };
 
-    this.uploader.onSuccessItem = (item, response, status, headers) => {
-      if (response) {
-        const photo: Photo = JSON.parse(response);
+    this.uploader.onSuccessItem = (item, res, status, headers) => {
+      if (res) {
+        const photo: Photo = JSON.parse(res);
         this.member.photos.push(photo);
+        if (photo.isMain) {
+          this.user.photoUrl = photo.imageUrl;
+          this.member.photoUrl = photo.imageUrl;
+          this.accountService.setCurrentUser(this.user);
+        }
       }
     };
   }
