@@ -1,20 +1,23 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services
 {
     public class TokenService : Interfaces.ITokenService
     {
+        private readonly UserManager<AppUser> _userManager;
         private readonly SymmetricSecurityKey _symmetricSecurityKey;
 
-        public TokenService(IConfiguration config)
+        public TokenService(IConfiguration config, UserManager<AppUser> userManager)
         {
+            _userManager = userManager;
             _symmetricSecurityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(config["TokenKey"]));
         }
 
-        public string CreateToken(AppUser user)
+        public async Task<string> CreateToken(AppUser user)
         {
             var claims = new List<Claim>
             {
@@ -22,6 +25,9 @@ namespace API.Services
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
             };
 
+            var roles = await _userManager.GetRolesAsync(user);
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            
             var credentials = new SigningCredentials(_symmetricSecurityKey, SecurityAlgorithms.HmacSha512Signature);
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -32,7 +38,6 @@ namespace API.Services
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);

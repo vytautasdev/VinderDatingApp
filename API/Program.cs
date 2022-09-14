@@ -1,4 +1,6 @@
 using API.Data;
+using API.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API
@@ -14,13 +16,16 @@ namespace API
             try
             {
                 var dataContext = services.GetRequiredService<DataContext>();
+                var userManager = services.GetRequiredService<UserManager<AppUser>>();
+                var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
+
                 await dataContext.Database.MigrateAsync();
-                await Seed.SeedUsers(dataContext);
+                await Seed.SeedUsers(userManager, roleManager);
             }
             catch (System.Exception ex)
             {
                 var logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(ex, "An unexpected error occurred during database migration. Please try again later.");
+                logger.LogError(ex, "An unexpected error occurred during database migration");
             }
 
             await host.RunAsync();
@@ -28,9 +33,6 @@ namespace API
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }
 }
