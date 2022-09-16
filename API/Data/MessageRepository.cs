@@ -4,7 +4,6 @@ using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
@@ -20,6 +19,36 @@ public class MessageRepository : IMessageRepository
         _mapper = mapper;
     }
 
+    public void AddGroup(Group group)
+    {
+        _dataContext.Groups.Add(group);
+    }
+
+    public void RemoveConnection(Connection connection)
+    {
+        _dataContext.Connections.Remove(connection);
+    }
+
+    public async Task<Connection> GetConnection(string connectionId)
+    {
+        return await _dataContext.Connections.FindAsync(connectionId);
+    }
+
+    public async Task<Group> GetMessageGroup(string groupName)
+    {
+        return await _dataContext.Groups
+            .Include(x => x.Connections)
+            .FirstOrDefaultAsync(x => x.Name == groupName);
+    }
+
+    public async Task<Group> GetGroupForConnection(string connectionId)
+    {
+        return await _dataContext.Groups
+            .Include(c => c.Connections)
+            .Where(c => c.Connections.Any(x => x.ConnectionId == connectionId))
+            .FirstOrDefaultAsync();
+    }
+
     public void AddMessage(Message message)
     {
         _dataContext.Messages.Add(message);
@@ -33,8 +62,8 @@ public class MessageRepository : IMessageRepository
     public async Task<Message> GetMessage(int id)
     {
         return await _dataContext.Messages
-            .Include(u=>u.Sender)
-            .Include(u=>u.Recipient)
+            .Include(u => u.Sender)
+            .Include(u => u.Recipient)
             .SingleOrDefaultAsync(x => x.Id == id);
     }
 
@@ -79,7 +108,7 @@ public class MessageRepository : IMessageRepository
         {
             foreach (var message in unreadMessages)
             {
-                message.DateRead = DateTime.Now;
+                message.DateRead = DateTime.UtcNow;
             }
 
             await _dataContext.SaveChangesAsync();

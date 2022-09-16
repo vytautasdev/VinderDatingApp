@@ -32,7 +32,13 @@
   </div>
   <div class="card-body">
     <h6 class="card-title text-center">
-      <span class="fw-bold">{{ member.knownAs }}, {{ member.age }}</span>
+      <span
+        [class.is-online]="
+          (presence.onlineUsers$ | async).includes(member.username)
+        "
+        ><i class="fa fa-circle"></i>
+      </span>
+      {{ member.knownAs }}, {{ member.age }}
     </h6>
     <p class="card-text text-muted text-center" style="margin-top: -8px">
       {{ member.city }}
