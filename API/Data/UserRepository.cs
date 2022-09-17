@@ -66,17 +66,14 @@ namespace API.Data
 
         public async Task<string> GetUserGender(string username)
         {
-            throw new NotImplementedException();
+            return await _dataContext.Users.Where(x => x.UserName == username)
+                .Select(x => x.Gender)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<AppUser>> GetUsersAsync()
         {
             return await _dataContext.Users.Include(p => p.Photos).ToListAsync();
-        }
-
-        public async Task<bool> SaveAllAsync()
-        {
-            return await _dataContext.SaveChangesAsync() > 0;
         }
 
         public void Update(AppUser user)
