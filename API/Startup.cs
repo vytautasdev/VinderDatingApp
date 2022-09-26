@@ -38,7 +38,8 @@ namespace API
 
             app.UseCors(cors =>
                 cors.AllowAnyHeader().AllowAnyMethod().AllowCredentials().AllowAnyOrigin()
-                    .WithOrigins("https://localhost:4200"));
+                    // .WithOrigins("https://localhost:4200"));
+                    .WithOrigins("https://vinderapp.herokuapp.com"));
 
             app.UseAuthentication();
 
